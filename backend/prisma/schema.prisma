@@ -1,0 +1,75 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id      Int       @id @default(autoincrement())
+  email   String    @unique
+  name    String?
+  bookings Booking[]
+}
+
+// Cinema model to list all available cinemas
+model Cinema {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  location String
+  screens Screen[]
+}
+
+// Screen model to manage screens within a cinema
+model Screen {
+  id       Int     @id @default(autoincrement())
+  name     String
+  cinemaId Int
+  cinema   Cinema  @relation(fields: [cinemaId], references: [id])
+  shows    Show[]
+
+  @@unique([name, cinemaId]) // Ensures screen names are unique per cinema
+}
+
+// Movie model to display movie details
+model Movie {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  posterUrl   String?
+  shows       Show[]
+}
+
+// Show model to manage specific showtimes
+model Show {
+  id        Int      @id @default(autoincrement())
+  movieId   Int
+  screenId  Int
+  showtime  DateTime
+  price     Decimal
+  movie     Movie    @relation(fields: [movieId], references: [id])
+  screen    Screen   @relation(fields: [screenId], references: [id])
+  bookings  Booking[]
+
+  @@unique([movieId, screenId, showtime]) // Prevents duplicate shows for the same movie, screen, and time
+}
+
+// Booking model to save a user's seat selections
+model Booking {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  showId    Int
+  seats     String[] // An array of strings to store the booked seat numbers (e.g., ["A1", "A2"])
+  bookingTime DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  show      Show     @relation(fields: [showId], references: [id])
+}
