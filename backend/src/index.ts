@@ -3,8 +3,10 @@ import type { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 
-import cinemaRoutes from './routes/cinemas.ts';
-import movieRoutes from './routes/movies.ts';
+import cinemaRoutes from './routes/cinemas.routes.ts';
+import movieRoutes from './routes/movies.routes.ts';
+import bookingRoutes from './routes/bookings.routes.ts';
+import userRoutes from './routes/users.routes.ts';
 
 dotenv.config();
 
@@ -13,6 +15,8 @@ const port = process.env.PORT || 3000;
 
 // Initialize Prisma Client
 const prisma = new PrismaClient();
+
+app.use(express.json());
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Welcome to the Movie Booking API!');
@@ -32,6 +36,8 @@ app.get('/test-db', async (req: Request, res: Response) => {
 
 app.use('/api/cinemas', cinemaRoutes);
 app.use('/api/movies', movieRoutes);
+app.use('/api/bookings', bookingRoutes);
+app.use('/api/users', userRoutes);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);

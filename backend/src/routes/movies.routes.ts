@@ -3,8 +3,7 @@ import { prisma } from '../index.ts';
 
 const router = express.Router();
 
-// GET /api/movies - Get a list of all movies
-router.get('/', async (req, res) => {
+router.get('/', async (_, res) => {
   try {
     const movies = await prisma.movie.findMany();
     res.status(200).json(movies);
@@ -14,7 +13,6 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/movies/by-cinema/:cinemaId - Get movies and their showtimes for a specific cinema
 router.get('/by-cinema/:cinemaId', async (req, res) => {
   const { cinemaId } = req.params;
 
@@ -47,6 +45,39 @@ router.get('/by-cinema/:cinemaId', async (req, res) => {
   } catch (error) {
     console.error('Failed to fetch movies and showtimes for cinema:', error);
     res.status(500).json({ message: 'Failed to fetch movies and showtimes for cinema.' });
+  }
+});
+
+router.get('/show/:showId', async (req, res) => {
+  const { showId } = req.params;
+
+  try {
+    const show = await prisma.show.findUnique({
+      where: { id: parseInt(showId) },
+      include: {
+        bookings: {
+          select: {
+            seats: true,
+          },
+        },
+      },
+    });
+
+    if (!show) {
+      return res.status(404).json({ message: 'Show not found.' });
+    }
+
+    // Combine all booked seats from the bookings into a single array
+    const bookedSeats: string[] = show.bookings.flatMap((booking) => booking.seats);
+
+    // Return the show details along with the list of booked seats
+    res.status(200).json({
+      ...show,
+      bookedSeats,
+    });
+  } catch (error) {
+    console.error('Failed to fetch show details:', error);
+    res.status(500).json({ message: 'Failed to fetch show details.' });
   }
 });
 
