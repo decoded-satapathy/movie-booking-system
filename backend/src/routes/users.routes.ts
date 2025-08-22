@@ -44,4 +44,41 @@ router.post('/register', async (req, res) => {
   }
 });
 
+
+router.get('/:userId/bookings', async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const bookings = await prisma.booking.findMany({
+      where: {
+        userId: parseInt(userId),
+      },
+      orderBy: {
+        bookingTime: 'desc', // Show most recent bookings first
+      },
+      include: {
+        show: {
+          include: {
+            movie: true, // Include movie details for the show
+            screen: {
+              include: {
+                cinema: true, // Include cinema details for the screen
+              },
+            },
+          },
+        },
+      },
+    });
+
+    if (bookings.length === 0) {
+      return res.status(404).json({ message: 'No bookings found for this user.' });
+    }
+
+    res.status(200).json(bookings);
+  } catch (error) {
+    console.error('Failed to fetch user bookings:', error);
+    res.status(500).json({ message: 'Failed to fetch user bookings.' });
+  }
+});
+
 export default router;
