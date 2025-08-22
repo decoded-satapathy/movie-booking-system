@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../node_modules/.prisma/client"
@@ -14,32 +11,29 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-generator db {
-  provider = "prisma-db-push"
-  seed = "ts-node prisma/seed.ts"
-}
-
+// User model to store user information
 model User {
-  id      Int       @id @default(autoincrement())
-  email   String    @unique
-  name    String?
-  bookings Booking[]
+  id        Int       @id @default(autoincrement())
+  email     String    @unique
+  name      String?
+  password  String
+  bookings  Booking[]
 }
 
 // Cinema model to list all available cinemas
 model Cinema {
-  id      Int      @id @default(autoincrement())
-  name    String   @unique
+  id       Int      @id @default(autoincrement())
+  name     String   @unique
   location String
-  screens Screen[]
+  screens  Screen[]
 }
 
 // Screen model to manage screens within a cinema
 model Screen {
-  id       Int     @id @default(autoincrement())
+  id       Int      @id @default(autoincrement())
   name     String
   cinemaId Int
-  cinema   Cinema  @relation(fields: [cinemaId], references: [id])
+  cinema   Cinema   @relation(fields: [cinemaId], references: [id], onDelete: Cascade) // Added onDelete: Cascade
   shows    Show[]
 
   @@unique([name, cinemaId]) // Ensures screen names are unique per cinema
@@ -61,8 +55,8 @@ model Show {
   screenId  Int
   showtime  DateTime
   price     Decimal
-  movie     Movie    @relation(fields: [movieId], references: [id])
-  screen    Screen   @relation(fields: [screenId], references: [id])
+  movie     Movie    @relation(fields: [movieId], references: [id], onDelete: Cascade) // Added onDelete: Cascade
+  screen    Screen   @relation(fields: [screenId], references: [id], onDelete: Cascade) // Added onDelete: Cascade
   bookings  Booking[]
 
   @@unique([movieId, screenId, showtime]) // Prevents duplicate shows for the same movie, screen, and time
@@ -75,6 +69,6 @@ model Booking {
   showId    Int
   seats     String[] // An array of strings to store the booked seat numbers (e.g., ["A1", "A2"])
   bookingTime DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  show      Show     @relation(fields: [showId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade) // Added onDelete: Cascade
+  show      Show     @relation(fields: [showId], references: [id], onDelete: Cascade) // Added onDelete: Cascade
 }

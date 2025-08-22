@@ -7,6 +7,8 @@ import cinemaRoutes from './routes/cinemas.routes.ts';
 import movieRoutes from './routes/movies.routes.ts';
 import bookingRoutes from './routes/bookings.routes.ts';
 import userRoutes from './routes/users.routes.ts';
+import authRoutes from './routes/auth.routes.ts';
+import authMiddleware from './middleware/auth.middleware.ts';
 
 dotenv.config();
 
@@ -34,10 +36,14 @@ app.get('/test-db', async (req: Request, res: Response) => {
   }
 });
 
+app.use('/api/auth', authRoutes);
 app.use('/api/cinemas', cinemaRoutes);
 app.use('/api/movies', movieRoutes);
-app.use('/api/bookings', bookingRoutes);
+
+app.use(authMiddleware);
+
 app.use('/api/users', userRoutes);
+app.use('/api/bookings', bookingRoutes);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);
