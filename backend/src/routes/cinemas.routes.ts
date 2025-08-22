@@ -1,12 +1,29 @@
 import express from 'express';
-import { prisma } from '../index.ts'; // Import the prisma client from our main server file
+import { prisma } from '../index.ts';
 
 const router = express.Router();
 
+// GET /api/cinemas - Get a list of all cinemas, with optional city filter
 router.get('/', async (req, res) => {
+  const { city } = req.query;
+
   try {
-    console.log("/api/cinemas");
-    const cinemas = await prisma.cinema.findMany();
+    let whereClause = {};
+
+    // Check if a city query parameter was provided
+    if (city && typeof city === 'string') {
+      whereClause = {
+        location: {
+          equals: city,
+          mode: 'insensitive', // Case-insensitive search
+        },
+      };
+    }
+
+    const cinemas = await prisma.cinema.findMany({
+      where: whereClause,
+    });
+
     res.status(200).json(cinemas);
   } catch (error) {
     console.error('Failed to fetch cinemas:', error);
