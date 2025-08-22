@@ -55,11 +55,11 @@ router.get('/show/:showId', async (req, res) => {
     const show = await prisma.show.findUnique({
       where: { id: parseInt(showId) },
       include: {
-        bookings: {
-          select: {
-            seats: true,
-          },
-        },
+        screen: {
+          include: {
+            cinema: true
+          }
+        }
       },
     });
 
@@ -67,13 +67,10 @@ router.get('/show/:showId', async (req, res) => {
       return res.status(404).json({ message: 'Show not found.' });
     }
 
-    // Combine all booked seats from the bookings into a single array
-    const bookedSeats: string[] = show.bookings.flatMap((booking) => booking.seats);
 
     // Return the show details along with the list of booked seats
     res.status(200).json({
       ...show,
-      bookedSeats,
     });
   } catch (error) {
     console.error('Failed to fetch show details:', error);

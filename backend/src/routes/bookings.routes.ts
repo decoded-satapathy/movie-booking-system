@@ -47,4 +47,48 @@ router.post('/', async (req, res) => {
   }
 });
 
+
+// GET /api/bookings/show/:showId - Get bookings for a show, separated by current user
+router.get('/show/:showId', async (req, res) => {
+  const { showId } = req.params;
+  const userId = req.userId; // Get userId from the JWT payload
+
+  if (!userId) {
+    return res.status(401).json({ message: 'Unauthorized. User ID not found in token.' });
+  }
+
+  try {
+    const allBookingsForShow = await prisma.booking.findMany({
+      where: {
+        showId: parseInt(showId),
+      },
+      select: {
+        userId: true,
+        seats: true,
+      },
+    });
+
+    // Separate bookings into two lists
+    const userBookings: string[] = [];
+    const otherBookings: string[] = [];
+
+    allBookingsForShow.forEach(booking => {
+      if (booking.userId === userId) {
+        userBookings.push(...booking.seats);
+      } else {
+        otherBookings.push(...booking.seats);
+      }
+    });
+
+    res.status(200).json({
+      userBookings: userBookings,
+      otherBookings: otherBookings
+    });
+
+  } catch (error) {
+    console.error('Failed to fetch bookings for show:', error);
+    res.status(500).json({ message: 'Failed to fetch bookings.' });
+  }
+});
+
 export default router;
