@@ -90,15 +90,8 @@ app.use('/api/bookings', authMiddleware, (req, _, next) => {
 
 }, bookingRoutes);
 
-// A simple test route to verify the database connection
-app.get('/test-db', async (req, res) => {
-  try {
-    await prisma.$queryRaw`SELECT 1`;
-    res.status(200).json({ message: 'Database connection successful!' });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'Database connection failed.', error: error });
-  }
+app.get('/heartbeat', async (_, res) => {
+  res.status(200).json({ message: "Server is alive" });
 });
 
 // Start the server
