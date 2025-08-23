@@ -41,7 +41,7 @@ router.post('/register', async (req, res) => {
       throw new Error('JWT secret is not defined.');
     }
 
-    const token = jwt.sign(payload, secret, { expiresIn: '1h' });
+    const token = jwt.sign(payload, secret, { expiresIn: '30d' });
 
     res.status(201).json({
       message: 'User registered successfully!',
@@ -88,7 +88,7 @@ router.post('/login', async (req, res) => {
       throw new Error('JWT secret is not defined.');
     }
 
-    const token = jwt.sign(payload, secret, { expiresIn: '1h' });
+    const token = jwt.sign(payload, secret, { expiresIn: '30d' });
 
     res.status(200).json({
       message: 'Login successful!',

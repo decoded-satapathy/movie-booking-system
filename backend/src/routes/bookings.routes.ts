@@ -6,6 +6,7 @@ const router = express.Router();
 // POST /api/bookings - Create a new booking
 router.post('/', async (req, res) => {
   const { userId, showId, seats } = req.body;
+  const io = req.io;
 
   if (!userId || !showId || !seats || seats.length === 0) {
     return res.status(400).json({ message: 'Missing required booking information.' });
@@ -27,6 +28,7 @@ router.post('/', async (req, res) => {
       }
     });
 
+
     if (existingBookings.length > 0) {
       return res.status(409).json({ message: 'One or more of the selected seats are already booked.' });
     }
@@ -39,6 +41,10 @@ router.post('/', async (req, res) => {
         seats: seats,
       },
     });
+
+    if (io) {
+      io.to(`show-${showId}`).emit("seatBooked", seats);
+    }
 
     res.status(201).json({ message: 'Booking confirmed!', booking: newBooking });
   } catch (error) {

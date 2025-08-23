@@ -13,6 +13,7 @@ import movieRoutes from './routes/movies.routes.ts';
 import bookingRoutes from './routes/bookings.routes.ts';
 import userRoutes from './routes/users.routes.ts';
 import authMiddleware from './middleware/auth.middleware.ts';
+import type { CustomSocket } from './middleware/socket.middleware.ts';
 
 dotenv.config();
 
@@ -21,7 +22,7 @@ const port = process.env.PORT || 3000;
 
 const server = http.createServer(app);
 
-const io = new SocketIOServer(server, {
+const io = new SocketIOServer<any, any, any, CustomSocket>(server, {
   cors: {
     // origin: 'http://localhost:5173', // Replace with your frontend URL
     origin: '*',
@@ -44,7 +45,11 @@ app.use('/api/movies', movieRoutes);
 
 // Protected Routes (Authentication required)
 app.use('/api/users', authMiddleware, userRoutes);
-app.use('/api/bookings', authMiddleware, bookingRoutes);
+app.use('/api/bookings', authMiddleware, (req, res, next) => {
+  req.io = io;
+  next();
+
+}, bookingRoutes);
 
 // A simple test route to verify the database connection
 app.get('/test-db', async (req, res) => {
