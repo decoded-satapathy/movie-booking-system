@@ -6,6 +6,7 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import { setupSocketIO } from './socket.ts';
 import cors from 'cors';
+import { rateLimit } from 'express-rate-limit';
 
 import authRoutes from './routes/auth.routes.ts';
 import cinemaRoutes from './routes/cinemas.routes.ts';
@@ -16,6 +17,13 @@ import authMiddleware from './middleware/auth.middleware.ts';
 import type { CustomSocket } from './middleware/socket.middleware.ts';
 
 dotenv.config();
+
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `windowMs`
+  standardHeaders: 'draft-7', // Return rate limit info in the `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -36,16 +44,23 @@ setupSocketIO(io);
 export const prisma = new PrismaClient();
 
 app.use(express.json());
+app.use(apiLimiter);
 app.use(cors());
 
 // Public Routes (No authentication required)
 app.use('/api/auth', authRoutes);
-app.use('/api/cinemas', cinemaRoutes);
-app.use('/api/movies', movieRoutes);
 
 // Protected Routes (Authentication required)
-app.use('/api/users', authMiddleware, userRoutes);
-app.use('/api/bookings', authMiddleware, (req, res, next) => {
+app.use('/api/cinemas', cinemaRoutes);
+app.use('/api/movies', movieRoutes);
+app.use('/api/users', authMiddleware,
+  (req, _, next) => {
+    req.io = io;
+    next();
+
+  },
+  userRoutes);
+app.use('/api/bookings', authMiddleware, (req, _, next) => {
   req.io = io;
   next();
 
