@@ -69,7 +69,7 @@ export const setupSocketIO = (io: SocketIOServer<any, any, any, CustomSocket>) =
 
       if (showId) {
         const keys = await redis.keys(`show:${showId}:seat:*`);
-        const userLockedKeys = [];
+        const userLockedKeys: string[] = [];
         for (const key of keys) {
           const lockedUserId = await redis.get(key);
           if (lockedUserId && lockedUserId === userId?.toString()) {

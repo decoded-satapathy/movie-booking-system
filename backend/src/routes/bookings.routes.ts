@@ -6,6 +6,7 @@ const router = express.Router();
 // POST /api/bookings - Create a new booking
 router.post('/', async (req, res) => {
   const { userId, showId, seats } = req.body;
+  // @ts-ignore
   const io = req.io;
 
   if (!userId || !showId || !seats || seats.length === 0) {

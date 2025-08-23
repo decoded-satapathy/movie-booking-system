@@ -59,12 +59,14 @@ app.use('/api/cinemas', cinemaRoutes);
 app.use('/api/movies', movieRoutes);
 app.use('/api/users', authMiddleware,
   (req, _, next) => {
+    // @ts-ignore
     req.io = io;
     next();
 
   },
   userRoutes);
 app.use('/api/bookings', authMiddleware, (req, _, next) => {
+  // @ts-ignore
   req.io = io;
   next();
 

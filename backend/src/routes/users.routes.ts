@@ -81,8 +81,10 @@ router.delete('/:bookingId', async (req, res) => {
     });
 
     // 4. Emit WebSocket event for each cancelled seat
+    // @ts-ignore
     if (req.io) {
       booking.seats.forEach(seatId => {
+        // @ts-ignore
         req.io?.to(`show-${booking.showId}`).emit('seatUnbooked', { seatId: seatId, showId: booking.showId });
       });
     }
