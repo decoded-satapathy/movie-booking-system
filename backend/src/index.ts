@@ -18,6 +18,22 @@ import type { CustomSocket } from './middleware/socket.middleware';
 
 dotenv.config();
 
+const allowedOrigins = [
+  'http://localhost:5173',
+  'https://your-production-url.com' // Add your production URL here
+];
+
+const corsOptions = {
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true // Important for cookies, if you were to use them
+};
+
 const strictApiLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 15 minutes
   max: 10, // Limit each IP to 100 requests per `windowMs`
@@ -35,8 +51,10 @@ const server = http.createServer(app);
 
 const io = new SocketIOServer<any, any, any, CustomSocket>(server, {
   cors: {
-    // origin: 'http://localhost:5173', // Replace with your frontend URL
-    origin: '*',
+    origin: [
+      'http://localhost:5173',
+      'https://your-production-url.com'
+    ],
     methods: ['GET', 'POST'],
   },
 });
@@ -47,12 +65,10 @@ setupSocketIO(io);
 export const prisma = new PrismaClient();
 
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
 
-// Public Routes (No authentication required)
 app.use('/api/auth', strictApiLimiter, authRoutes);
 
-// Protected Routes (Authentication required)
 
 app.use(relaxedApiLimiter);
 app.use('/api/cinemas', cinemaRoutes);
