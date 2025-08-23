@@ -73,7 +73,7 @@ const CinemaDetail: React.FC = () => {
       <div className="space-y-8">
         {movies.map((movie) => (
           <Card key={movie.id}>
-            <div className="flex flex-col md:flex-row">
+            <div className="flex flex-col md:flex-row md:justify-center md:items-center">
               <div className="md:w-1/4 p-6">
                 <img
                   src={movie.posterUrl}
