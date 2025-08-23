@@ -4,17 +4,17 @@ import http from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
-import { setupSocketIO } from './socket.ts';
+import { setupSocketIO } from './socket';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
 
-import authRoutes from './routes/auth.routes.ts';
-import cinemaRoutes from './routes/cinemas.routes.ts';
-import movieRoutes from './routes/movies.routes.ts';
-import bookingRoutes from './routes/bookings.routes.ts';
-import userRoutes from './routes/users.routes.ts';
-import authMiddleware from './middleware/auth.middleware.ts';
-import type { CustomSocket } from './middleware/socket.middleware.ts';
+import authRoutes from './routes/auth.routes';
+import cinemaRoutes from './routes/cinemas.routes';
+import movieRoutes from './routes/movies.routes';
+import bookingRoutes from './routes/bookings.routes';
+import userRoutes from './routes/users.routes';
+import authMiddleware from './middleware/auth.middleware';
+import type { CustomSocket } from './middleware/socket.middleware';
 
 dotenv.config();
 

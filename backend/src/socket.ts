@@ -1,8 +1,8 @@
 import { Server as SocketIOServer } from 'socket.io';
-import { default as Redis } from "ioredis";
 import dotenv from 'dotenv';
-import socketAuthMiddleware from './middleware/socket.middleware.ts';
-import type { CustomSocket } from './middleware/socket.middleware.ts';
+import socketAuthMiddleware from './middleware/socket.middleware';
+import type { CustomSocket } from './middleware/socket.middleware';
+import { default as Redis } from 'ioredis';
 
 dotenv.config();
 
