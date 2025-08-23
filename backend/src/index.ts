@@ -21,7 +21,8 @@ dotenv.config();
 const allowedOrigins = [
   'http://localhost:5173',
   'https://cinemax.decoded-satapathy.tech',
-  'https://movie-booking-system-one.vercel.app'
+  'https://movie-booking-system-one.vercel.app',
+  "https://movie-booking-system-1.onrender.com"
 ];
 
 const corsOptions = {
@@ -55,7 +56,8 @@ const io = new SocketIOServer<any, any, any, CustomSocket>(server, {
     origin: [
       'http://localhost:5173',
       'https://cinemax.decoded-satapathy.tech',
-      'https://movie-booking-system-one.vercel.app'
+      'https://movie-booking-system-one.vercel.app',
+      "https://movie-booking-system-1.onrender.com"
     ],
     methods: ['GET', 'POST'],
   },
