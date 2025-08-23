@@ -12,8 +12,8 @@ class WebSocketService {
     const authToken = getAuthToken();
 
 
-    const backendUrl = process.env.NODE_ENV === 'production'
-      ? process.env.API_BASE_URL
+    const backendUrl = import.meta.env.VITE_ENV === 'production'
+      ? import.meta.env.VITE_API_BASE_URL
       : 'http://localhost:3000';
 
     this.socket = io(backendUrl, {
