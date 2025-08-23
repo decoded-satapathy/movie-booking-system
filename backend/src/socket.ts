@@ -6,11 +6,11 @@ import type { CustomSocket } from './middleware/socket.middleware.ts';
 
 dotenv.config();
 
-const redis = new Redis.default(process.env.REDIS_URL || "");
+const redis = new Redis(process.env.REDIS_URL || "");
 
 const getBlockedSeats = async (showId: string): Promise<string[]> => {
-  const keys = await redis.keys(`show:${showId}:seat:*`);
-  const blockedSeats = keys.map(key => key.split(':').pop() || '');
+  const keys: string[] = await redis.keys(`show:${showId}:seat:*`);
+  const blockedSeats = keys.map((key: string) => key.split(':').pop() || '');
   return blockedSeats;
 };
 

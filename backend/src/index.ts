@@ -6,7 +6,7 @@ import dotenv from 'dotenv';
 import { PrismaClient } from '@prisma/client';
 import { setupSocketIO } from './socket.ts';
 import cors from 'cors';
-import { rateLimit } from 'express-rate-limit';
+import rateLimit from 'express-rate-limit';
 
 import authRoutes from './routes/auth.routes.ts';
 import cinemaRoutes from './routes/cinemas.routes.ts';
@@ -21,15 +21,11 @@ dotenv.config();
 const strictApiLimiter = rateLimit({
   windowMs: 5 * 60 * 1000, // 15 minutes
   max: 10, // Limit each IP to 100 requests per `windowMs`
-  standardHeaders: 'draft-7', // Return rate limit info in the `RateLimit` header
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
 const relaxedApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 1000, // Limit each IP to 100 requests per `windowMs`
-  standardHeaders: 'draft-7', // Return rate limit info in the `RateLimit` header
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 
 const app: Express = express();
