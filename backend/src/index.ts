@@ -73,8 +73,8 @@ app.use('/api/auth', strictApiLimiter, authRoutes);
 
 
 app.use(relaxedApiLimiter);
-app.use('/api/cinemas', cinemaRoutes);
-app.use('/api/movies', movieRoutes);
+app.use('/api/cinemas', authMiddleware, cinemaRoutes);
+app.use('/api/movies', authMiddleware, movieRoutes);
 app.use('/api/users', authMiddleware,
   (req, _, next) => {
     // @ts-ignore
