@@ -18,9 +18,16 @@ import type { CustomSocket } from './middleware/socket.middleware.ts';
 
 dotenv.config();
 
-const apiLimiter = rateLimit({
+const strictApiLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 100 requests per `windowMs`
+  standardHeaders: 'draft-7', // Return rate limit info in the `RateLimit` header
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
+const relaxedApiLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `windowMs`
+  max: 1000, // Limit each IP to 100 requests per `windowMs`
   standardHeaders: 'draft-7', // Return rate limit info in the `RateLimit` header
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
@@ -44,13 +51,14 @@ setupSocketIO(io);
 export const prisma = new PrismaClient();
 
 app.use(express.json());
-app.use(apiLimiter);
 app.use(cors());
 
 // Public Routes (No authentication required)
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', strictApiLimiter, authRoutes);
 
 // Protected Routes (Authentication required)
+
+app.use(relaxedApiLimiter);
 app.use('/api/cinemas', cinemaRoutes);
 app.use('/api/movies', movieRoutes);
 app.use('/api/users', authMiddleware,
