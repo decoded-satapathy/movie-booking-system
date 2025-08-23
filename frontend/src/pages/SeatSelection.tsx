@@ -43,7 +43,7 @@ const SeatSelection: React.FC = () => {
   };
 
   const setupWebSocket = (id: number) => {
-    const socket = websocketService.connect(id);
+    websocketService.connect(id);
 
     // New listener to sync state with Redis
     websocketService.onInitialBlockedSeats((blockedSeats: string[]) => {

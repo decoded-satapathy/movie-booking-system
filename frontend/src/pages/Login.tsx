@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Film, Loader2 } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from "sonner";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -14,7 +14,6 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,16 +21,16 @@ const Login: React.FC = () => {
 
     try {
       await login(email, password);
-      toast({
-        title: "Welcome back!",
+      toast.success(
+        "Welcome back!", {
         description: "You have successfully logged in.",
       });
       navigate('/');
     } catch (error: any) {
-      toast({
-        title: "Login failed",
+      console.log(error);
+      toast.error(
+        "Login failed", {
         description: error.response?.data?.message || "Invalid credentials",
-        variant: "destructive",
       });
     } finally {
       setLoading(false);
