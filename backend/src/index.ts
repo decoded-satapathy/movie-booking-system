@@ -20,7 +20,8 @@ dotenv.config();
 
 const allowedOrigins = [
   'http://localhost:5173',
-  'https://your-production-url.com' // Add your production URL here
+  'cinemax.decoded-satapathy.tech',
+  'movie-booking-system-one.vercel.app'
 ];
 
 const corsOptions = {
@@ -53,7 +54,8 @@ const io = new SocketIOServer<any, any, any, CustomSocket>(server, {
   cors: {
     origin: [
       'http://localhost:5173',
-      'https://your-production-url.com'
+      'cinemax.decoded-satapathy.tech',
+      'movie-booking-system-one.vercel.app'
     ],
     methods: ['GET', 'POST'],
   },
