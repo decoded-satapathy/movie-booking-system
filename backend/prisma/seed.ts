@@ -1,105 +1,95 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
+const saltRounds = 10;
+
+// Helper function to generate unique image URLs
+const getMovieImageUrl = (id: number): string => `https://picsum.photos/200/300?random=${id}`;
 
 async function main() {
   console.log('Start seeding...');
 
-  // Create Cinemas
-  const cinema1 = await prisma.cinema.create({
+  // Create a sample admin user with a password
+  const hashedPassword = await bcrypt.hash('password', saltRounds);
+
+  const normalUser = await prisma.user.create({
     data: {
-      name: 'PVR Cinemas',
-      location: 'New Delhi',
+      email: 'user@example.com',
+      name: 'Normal User',
+      password: hashedPassword,
     },
   });
 
-  const cinema2 = await prisma.cinema.create({
-    data: {
-      name: 'INOX Cinemas',
-      location: 'Mumbai',
-    },
-  });
+  console.log('Created users:', { normalUser });
 
-  console.log('Created cinemas:', { cinema1, cinema2 });
+  const cities = ['New Delhi', 'Mumbai', 'Bangalore', 'Kolkata', 'Chennai'];
 
-  // Create Screens for Cinemas
-  const screen1_c1 = await prisma.screen.create({
-    data: {
-      name: 'Screen 1',
-      cinemaId: cinema1.id,
-    },
-  });
+  const cinemas = [];
+  for (const city of cities) {
+    for (let i = 1; i <= 3; i++) {
+      const cinema = await prisma.cinema.create({
+        data: {
+          name: `Cinema ${i} ${city}`,
+          location: city,
+        },
+      });
+      cinemas.push(cinema);
+      console.log(`Created cinema: ${cinema.name}`);
+    }
+  }
 
-  const screen2_c1 = await prisma.screen.create({
-    data: {
-      name: 'Screen 2',
-      cinemaId: cinema1.id,
-    },
-  });
+  const movies = [];
+  for (let i = 1; i <= 10; i++) {
+    const movie = await prisma.movie.create({
+      data: {
+        title: `Movie Title ${i}`,
+        description: `This is a movie description for movie number ${i}.`,
+        posterUrl: getMovieImageUrl(i),
+      },
+    });
+    movies.push(movie);
+  }
+  console.log(`Created ${movies.length} movies`);
 
-  const screen1_c2 = await prisma.screen.create({
-    data: {
-      name: 'Screen A',
-      cinemaId: cinema2.id,
-    },
-  });
+  const screens = [];
+  for (const cinema of cinemas) {
+    for (let i = 1; i <= 4; i++) {
+      const screen = await prisma.screen.create({
+        data: {
+          name: `Screen ${i}`,
+          cinemaId: cinema.id,
+        },
+      });
+      screens.push(screen);
+    }
+  }
+  console.log(`Created ${screens.length} screens`);
 
-  console.log('Created screens:', { screen1_c1, screen2_c1, screen1_c2 });
+  const showtimes = [10, 13, 16, 19, 22]; // 10 AM, 1 PM, 4 PM, 7 PM, 10 PM
+  const prices = [150.00, 180.00, 200.00];
 
-  // Create Movies
-  const movie1 = await prisma.movie.create({
-    data: {
-      title: 'The Great Adventure',
-      description: 'A thrilling movie about an epic quest.',
-      posterUrl: 'https://example.com/poster1.jpg',
-    },
-  });
-
-  const movie2 = await prisma.movie.create({
-    data: {
-      title: 'City Lights',
-      description: 'A charming romantic comedy.',
-      posterUrl: 'https://example.com/poster2.jpg',
-    },
-  });
-
-  console.log('Created movies:', { movie1, movie2 });
-
-  // Create Shows
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
-
-  // Show 1: The Great Adventure at PVR Screen 1 (tomorrow 10 AM)
-  const show1 = await prisma.show.create({
-    data: {
-      showtime: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 10, 0),
-      price: 150.00,
-      movieId: movie1.id,
-      screenId: screen1_c1.id,
-    },
-  });
-
-  // Show 2: City Lights at PVR Screen 2 (tomorrow 3 PM)
-  const show2 = await prisma.show.create({
-    data: {
-      showtime: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 15, 0),
-      price: 120.00,
-      movieId: movie2.id,
-      screenId: screen2_c1.id,
-    },
-  });
-
-  // Show 3: The Great Adventure at INOX Screen A (tomorrow 7 PM)
-  const show3 = await prisma.show.create({
-    data: {
-      showtime: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), 19, 0),
-      price: 180.00,
-      movieId: movie1.id,
-      screenId: screen1_c2.id,
-    },
-  });
-
-  console.log('Created shows:', { show1, show2, show3 });
+  const shows = [];
+  for (const screen of screens) {
+    // Each screen will show 2 movies
+    const randomMovies = movies.sort(() => 0.5 - Math.random()).slice(0, 2);
+    for (const movie of randomMovies) {
+      for (const time of showtimes) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const show = await prisma.show.create({
+          data: {
+            showtime: new Date(tomorrow.getFullYear(), tomorrow.getMonth(), tomorrow.getDate(), time, 0),
+            price: prices[Math.floor(Math.random() * prices.length)] || 100,
+            movieId: movie.id,
+            screenId: screen.id,
+          },
+        });
+        shows.push(show);
+      }
+    }
+  }
+  console.log(`Created ${shows.length} shows`);
 }
 
 main()
