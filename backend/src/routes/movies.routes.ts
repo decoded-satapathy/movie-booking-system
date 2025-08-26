@@ -78,4 +78,41 @@ router.get('/show/:showId', async (req, res) => {
   }
 });
 
+router.get("/:movieId", async (req, res) => {
+  const { movieId } = req.params;
+
+  try {
+    const movie = await prisma.movie.findUnique({
+      where: { id: parseInt(movieId) },
+    })
+
+    if (!movie) {
+      return res.status(404).json({ message: "Movie was not found" });
+    }
+
+    const shows = await prisma.show.findMany({
+      where: {
+        movieId: parseInt(movieId)
+      },
+      include: {
+        screen: {
+          include: {
+            cinema: true
+          }
+        }
+      }
+    })
+
+
+    if (shows.length === 0) {
+      return res.status(404).json({ message: "No shows with selected movie was found" });
+    }
+
+    res.status(200).json(shows);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch shows for the movie", error })
+  }
+
+})
+
 export default router;
