@@ -66,7 +66,7 @@ const Home: React.FC = () => {
         </p>
       </div>
 
-      <div className="max-w-md mx-auto mb-8">
+      <div className="max-w-md mx-auto mb-8 flex flex-col justify-center items-center w-full gap-y-4">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-5 w-5" />
           <Input
@@ -77,7 +77,13 @@ const Home: React.FC = () => {
             className="pl-10"
           />
         </div>
+        <Button
+          onClick={() => navigate('/search/movie')}
+        >
+          Search by movie
+        </Button>
       </div>
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredCinemas.map((cinema) => (

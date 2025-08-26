@@ -28,6 +28,11 @@ export const movieService = {
     };
   },
 
+  async getShowsByMovieId(movieId: number): Promise<Show[]> {
+    const response = await api.get(`/api/movies/${movieId}`);
+    return response.data;
+  },
+
   async createBooking(booking: BookingRequest): Promise<Booking> {
     const response = await api.post('/api/bookings', booking);
     return response.data;

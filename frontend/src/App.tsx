@@ -12,6 +12,8 @@ import CinemaDetail from '@/pages/CinemaDetail';
 import SeatSelection from '@/pages/SeatSelection';
 import BookingConfirmation from '@/pages/BookingConfirmation';
 import BookingHistory from '@/pages/BookingHistory';
+import SearchByMovie from './pages/SearchByMovie';
+import MovieDetail from './pages/MovieDetail';
 
 const AppRoutes: React.FC = () => {
   const { user, loading } = useAuth();
@@ -26,63 +28,83 @@ const AppRoutes: React.FC = () => {
 
   return (
     <Routes>
-      <Route 
-        path="/login" 
-        element={user ? <Navigate to="/" replace /> : <Login />} 
+      <Route
+        path="/login"
+        element={user ? <Navigate to="/" replace /> : <Login />}
       />
-      <Route 
-        path="/register" 
-        element={user ? <Navigate to="/" replace /> : <Register />} 
+      <Route
+        path="/register"
+        element={user ? <Navigate to="/" replace /> : <Register />}
       />
-      <Route 
-        path="/" 
+      <Route
+        path="/"
         element={
           <ProtectedRoute>
             <Layout>
               <Home />
             </Layout>
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/cinema/:cinemaId" 
+      <Route
+        path="/cinema/:cinemaId"
         element={
           <ProtectedRoute>
             <Layout>
               <CinemaDetail />
             </Layout>
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/booking/:showId" 
+      <Route
+        path="/booking/:showId"
         element={
           <ProtectedRoute>
             <Layout>
               <SeatSelection />
             </Layout>
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/booking-confirmation" 
+      <Route
+        path="/booking-confirmation"
         element={
           <ProtectedRoute>
             <Layout>
               <BookingConfirmation />
             </Layout>
           </ProtectedRoute>
-        } 
+        }
       />
-      <Route 
-        path="/bookings" 
+      <Route
+        path="/bookings"
         element={
           <ProtectedRoute>
             <Layout>
               <BookingHistory />
             </Layout>
           </ProtectedRoute>
-        } 
+        }
+      />
+      <Route
+        path="/search/movie"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <SearchByMovie />
+            </Layout>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/movie/:movieId"
+        element={
+          <ProtectedRoute>
+            <Layout>
+              <MovieDetail />
+            </Layout>
+          </ProtectedRoute>
+        }
       />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>

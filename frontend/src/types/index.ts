@@ -28,7 +28,7 @@ export interface Show {
     id: number;
     name: string;
     cinemaId: number;
-    cinema?: Cinema;
+    cinema: Cinema;
   };
   movie?: Movie;
   userBookings: string[];
